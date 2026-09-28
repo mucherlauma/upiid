@@ -1,10 +1,7 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Payment</title>
@@ -12,7 +9,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
-
 *{
     margin:0;
     padding:0;
@@ -32,17 +28,16 @@ body{
 .payment-container{
     width:420px;
     max-width:100%;
-    background:white;
+    background:#fff;
     padding:30px;
     border-radius:22px;
-    box-shadow:0 15px 40px rgba(0,0,0,0.12);
+    box-shadow:0 15px 40px rgba(0,0,0,.12);
     text-align:center;
 }
 
-.payment-container h1{
+h1{
     color:#243b64;
     margin-bottom:8px;
-    font-size:28px;
 }
 
 .subtitle{
@@ -61,10 +56,10 @@ body{
 .amount-label{
     color:#777;
     font-size:13px;
-    margin-bottom:5px;
 }
 
 .amount{
+    margin-top:5px;
     font-size:34px;
     font-weight:bold;
     color:#243b64;
@@ -77,22 +72,22 @@ body{
     gap:15px;
     padding:16px;
     margin-bottom:15px;
-    background:white;
-    border:2px solid #eeeeee;
+    background:#fff;
+    border:2px solid #eee;
     border-radius:15px;
     cursor:pointer;
-    transition:0.3s;
+    transition:.3s;
     text-align:left;
 }
 
 .payment-option:hover{
     transform:translateY(-3px);
     border-color:#243b64;
-    box-shadow:0 8px 20px rgba(36,59,100,0.12);
+    box-shadow:0 8px 20px rgba(36,59,100,.12);
 }
 
 .payment-option.disabled{
-    opacity:0.6;
+    opacity:.5;
     pointer-events:none;
 }
 
@@ -159,7 +154,7 @@ body{
     display:none;
     align-items:center;
     justify-content:center;
-    background:rgba(0,0,0,0.65);
+    background:rgba(0,0,0,.65);
     padding:20px;
     z-index:1000;
 }
@@ -167,7 +162,7 @@ body{
 .qr-box{
     width:350px;
     max-width:100%;
-    background:white;
+    background:#fff;
     border-radius:20px;
     padding:25px;
     text-align:center;
@@ -188,7 +183,6 @@ body{
 #qrcode{
     display:flex;
     justify-content:center;
-    align-items:center;
     margin:20px 0;
 }
 
@@ -196,34 +190,11 @@ body{
     width:100%;
     border:none;
     background:#243b64;
-    color:white;
+    color:#fff;
     padding:13px;
     border-radius:10px;
     cursor:pointer;
     font-size:15px;
-}
-
-.close-btn:hover{
-    background:#172b4d;
-}
-
-.loading{
-    opacity:0.6;
-}
-
-.success-icon{
-    font-size:35px;
-    margin-bottom:5px;
-}
-
-.retry-btn{
-    margin-top:10px;
-    padding:10px 18px;
-    border:none;
-    border-radius:8px;
-    background:#243b64;
-    color:white;
-    cursor:pointer;
 }
 
 @media(max-width:480px){
@@ -236,7 +207,7 @@ body{
         padding:22px;
     }
 
-    .payment-container h1{
+    h1{
         font-size:24px;
     }
 
@@ -253,28 +224,15 @@ body{
         padding:13px;
         gap:12px;
     }
-
-    .payment-info h3{
-        font-size:16px;
-    }
-
-    .payment-info p{
-        font-size:12px;
-    }
-
 }
-
 </style>
-
 </head>
 
 <body>
 
-<div class="payment-container" id="paymentContainer">
+<div class="payment-container">
 
-    <h1>
-        Make Payment
-    </h1>
+    <h1>Make Payment</h1>
 
     <p class="subtitle">
         Choose your preferred payment method
@@ -306,9 +264,7 @@ body{
 
         <div class="payment-info">
 
-            <h3>
-                PhonePe
-            </h3>
+            <h3>PhonePe</h3>
 
             <p>
                 Pay securely using PhonePe
@@ -336,9 +292,7 @@ body{
 
         <div class="payment-info">
 
-            <h3>
-                Paytm
-            </h3>
+            <h3>Paytm</h3>
 
             <p>
                 Pay securely using Paytm
@@ -386,15 +340,16 @@ body{
 
 <script>
 
-let UPI_ID = "";
+const API_URL =
+    "https://upi-payment-website-rqfe.onrender.com";
 
-let MERCHANT_NAME = "";
+let UPI_ID = "9346696952@ybl";
 
-let AMOUNT = "";
+let MERCHANT_NAME = "cezoo";
+
+let AMOUNT = "1";
 
 let CURRENT_TRANSACTION_ID = "";
-
-let STATUS_CHECK_TIMER = null;
 
 let PAYMENT_STARTING = false;
 
@@ -403,15 +358,15 @@ async function loadPaymentConfig(){
 
     try{
 
-        const response = await fetch(
-            "/api/payment-config"
-        );
+        const response =
+            await fetch(
+                API_URL + "/api/payment-config"
+            );
 
         if(!response.ok){
 
             throw new Error(
-                "Configuration failed: " +
-                response.status
+                "Config request failed"
             );
 
         }
@@ -419,100 +374,55 @@ async function loadPaymentConfig(){
         const data =
             await response.json();
 
-
-        console.log(
-            "Payment Config:",
-            data
-        );
-
-
         UPI_ID =
-            data.upiId || "";
+            data.upiId || UPI_ID;
 
         MERCHANT_NAME =
-            data.merchantName || "Your Store";
+            data.merchantName ||
+            MERCHANT_NAME;
 
         AMOUNT =
-            data.amount || "";
-
-
-        if(!UPI_ID){
-
-            throw new Error(
-                "UPI ID not available"
-            );
-
-        }
-
-        if(!AMOUNT){
-
-            throw new Error(
-                "Amount not available"
-            );
-
-        }
-
+            data.amount || AMOUNT;
 
         document
             .getElementById("amount")
             .innerText =
             "₹" + AMOUNT;
 
-
-    }catch(error){
+    }
+    catch(error){
 
         console.error(
             "Config Error:",
             error
         );
 
-
         document
             .getElementById("amount")
             .innerText =
-            "₹1";
-
-
-        showError(
-            "Payment details load avvaledu. Please check Render Environment Variables."
-        );
+            "₹" + AMOUNT;
 
     }
-
 }
 
 
 function createUPILink(){
 
-    return "upi://pay" +
-
+    return (
+        "upi://pay" +
         "?pa=" +
         encodeURIComponent(UPI_ID) +
-
         "&pn=" +
         encodeURIComponent(MERCHANT_NAME) +
-
         "&am=" +
         encodeURIComponent(AMOUNT) +
-
-        "&cu=INR";
-
-}
-
-
-function isMobile(){
-
-    return /Android|iPhone|iPad|iPod/i.test(
-        navigator.userAgent
+        "&cu=INR"
     );
 
 }
 
 
 async function createPayment(method){
-
-    stopPaymentStatusChecking();
-
 
     const transactionId =
         "TXN" +
@@ -521,16 +431,16 @@ async function createPayment(method){
             Math.random() * 100000
         );
 
-
     const response =
         await fetch(
+            API_URL +
             "/api/create-payment",
             {
                 method:"POST",
 
                 headers:{
                     "Content-Type":
-                        "application/json"
+                    "application/json"
                 },
 
                 body:JSON.stringify({
@@ -553,12 +463,13 @@ async function createPayment(method){
             await response.text();
 
         console.error(
-            "Create Payment Error:",
+            "Server response:",
             errorText
         );
 
         throw new Error(
-            "Payment server error"
+            "Server error " +
+            response.status
         );
 
     }
@@ -566,12 +477,6 @@ async function createPayment(method){
 
     const data =
         await response.json();
-
-
-    console.log(
-        "Create Payment Response:",
-        data
-    );
 
 
     if(!data.success){
@@ -588,12 +493,6 @@ async function createPayment(method){
         transactionId;
 
 
-    localStorage.setItem(
-        "paymentTransactionId",
-        transactionId
-    );
-
-
     return transactionId;
 
 }
@@ -608,23 +507,25 @@ async function payWithPhonePe(){
 
     try{
 
-        if(!UPI_ID || !AMOUNT){
-
-            await loadPaymentConfig();
-
-        }
-
-
-        if(!UPI_ID || !AMOUNT){
-
-            return;
-
-        }
-
-
         PAYMENT_STARTING = true;
 
-        setPaymentOptionsDisabled(true);
+        setDisabled(true);
+
+        showProcessing(
+            "⏳ Opening payment..."
+        );
+
+
+        await loadPaymentConfig();
+
+
+        if(!UPI_ID){
+
+            throw new Error(
+                "UPI ID missing"
+            );
+
+        }
 
 
         await createPayment(
@@ -632,25 +533,24 @@ async function payWithPhonePe(){
         );
 
 
-        showProcessing(
-            "⏳ Payment Processing...<br>" +
-            "Please complete the payment in your UPI app."
-        );
-
-
-        startPaymentStatusChecking();
-
-
         const upiLink =
             createUPILink();
 
 
-        if(isMobile()){
+        const isMobile =
+            /Android|iPhone|iPad|iPod/i
+            .test(
+                navigator.userAgent
+            );
+
+
+        if(isMobile){
 
             window.location.href =
                 upiLink;
 
-        }else{
+        }
+        else{
 
             showQR(
                 upiLink
@@ -658,23 +558,21 @@ async function payWithPhonePe(){
 
         }
 
-
-    }catch(error){
+    }
+    catch(error){
 
         console.error(
             "PhonePe Error:",
             error
         );
 
-
         showError(
             "Payment start avvaledu. Please try again."
         );
 
-
         PAYMENT_STARTING = false;
 
-        setPaymentOptionsDisabled(false);
+        setDisabled(false);
 
     }
 
@@ -690,23 +588,16 @@ async function payWithPaytm(){
 
     try{
 
-        if(!UPI_ID || !AMOUNT){
-
-            await loadPaymentConfig();
-
-        }
-
-
-        if(!UPI_ID || !AMOUNT){
-
-            return;
-
-        }
-
-
         PAYMENT_STARTING = true;
 
-        setPaymentOptionsDisabled(true);
+        setDisabled(true);
+
+        showProcessing(
+            "⏳ Opening Paytm..."
+        );
+
+
+        await loadPaymentConfig();
 
 
         await createPayment(
@@ -714,267 +605,55 @@ async function payWithPaytm(){
         );
 
 
-        showProcessing(
-            "⏳ Payment Processing...<br>" +
-            "Please complete the payment in Paytm."
-        );
+        const paytmLink =
+            "paytmmp://pay" +
+            "?pa=" +
+            encodeURIComponent(UPI_ID) +
+            "&pn=" +
+            encodeURIComponent(MERCHANT_NAME) +
+            "&am=" +
+            encodeURIComponent(AMOUNT) +
+            "&cu=INR";
 
 
-        startPaymentStatusChecking();
+        const isMobile =
+            /Android|iPhone|iPad|iPod/i
+            .test(
+                navigator.userAgent
+            );
 
 
-        const upiLink =
-            createUPILink();
-
-
-        if(isMobile()){
+        if(isMobile){
 
             window.location.href =
-                "paytmmp://pay" +
+                paytmLink;
 
-                "?pa=" +
-                encodeURIComponent(
-                    UPI_ID
-                ) +
-
-                "&pn=" +
-                encodeURIComponent(
-                    MERCHANT_NAME
-                ) +
-
-                "&am=" +
-                encodeURIComponent(
-                    AMOUNT
-                ) +
-
-                "&cu=INR";
-
-        }else{
+        }
+        else{
 
             showQR(
-                upiLink
+                createUPILink()
             );
 
         }
 
-
-    }catch(error){
+    }
+    catch(error){
 
         console.error(
             "Paytm Error:",
             error
         );
 
-
         showError(
             "Payment start avvaledu. Please try again."
         );
 
-
         PAYMENT_STARTING = false;
 
-        setPaymentOptionsDisabled(false);
+        setDisabled(false);
 
     }
-
-}
-
-
-function startPaymentStatusChecking(){
-
-    stopPaymentStatusChecking();
-
-    checkPaymentStatus();
-
-    STATUS_CHECK_TIMER =
-        setInterval(
-            checkPaymentStatus,
-            3000
-        );
-
-}
-
-
-async function checkPaymentStatus(){
-
-    if(!CURRENT_TRANSACTION_ID){
-        return;
-    }
-
-
-    try{
-
-        const response =
-            await fetch(
-                "/api/payment-status/" +
-                encodeURIComponent(
-                    CURRENT_TRANSACTION_ID
-                )
-            );
-
-
-        if(!response.ok){
-            return;
-        }
-
-
-        const data =
-            await response.json();
-
-
-        console.log(
-            "Payment Status:",
-            data
-        );
-
-
-        if(data.status === "SUCCESS"){
-
-            stopPaymentStatusChecking();
-
-
-            showSuccess(
-                "<div class='success-icon'>✅</div>" +
-                "Payment Successful!<br>" +
-                "<span style='font-weight:normal'>" +
-                "Thank you for your payment." +
-                "</span>"
-            );
-
-
-            CURRENT_TRANSACTION_ID = "";
-
-            localStorage.removeItem(
-                "paymentTransactionId"
-            );
-
-
-            PAYMENT_STARTING = false;
-
-            setPaymentOptionsDisabled(
-                false
-            );
-
-
-            return;
-
-        }
-
-
-        if(data.status === "FAILED"){
-
-            stopPaymentStatusChecking();
-
-
-            showError(
-                "❌ Payment Failed.<br>" +
-                "Please try again."
-            );
-
-
-            CURRENT_TRANSACTION_ID = "";
-
-            localStorage.removeItem(
-                "paymentTransactionId"
-            );
-
-
-            PAYMENT_STARTING = false;
-
-            setPaymentOptionsDisabled(
-                false
-            );
-
-
-            return;
-
-        }
-
-
-        if(data.status === "PENDING"){
-
-            showProcessing(
-                "⏳ Payment Processing...<br>" +
-                "Please complete the payment."
-            );
-
-        }
-
-
-    }catch(error){
-
-        console.error(
-            "Status Check Error:",
-            error
-        );
-
-    }
-
-}
-
-
-function stopPaymentStatusChecking(){
-
-    if(STATUS_CHECK_TIMER){
-
-        clearInterval(
-            STATUS_CHECK_TIMER
-        );
-
-        STATUS_CHECK_TIMER = null;
-
-    }
-
-}
-
-
-function showQR(upiLink){
-
-    document
-        .getElementById("qrcode")
-        .innerHTML = "";
-
-
-    if(typeof QRCode === "undefined"){
-
-        showError(
-            "QR code library load avvaledu."
-        );
-
-        return;
-
-    }
-
-
-    new QRCode(
-
-        document.getElementById(
-            "qrcode"
-        ),
-
-        {
-            text:upiLink,
-            width:220,
-            height:220
-        }
-
-    );
-
-
-    document
-        .getElementById("qrOverlay")
-        .style.display =
-        "flex";
-
-}
-
-
-function closeQR(){
-
-    document
-        .getElementById("qrOverlay")
-        .style.display =
-        "none";
 
 }
 
@@ -986,10 +665,8 @@ function showProcessing(message){
             "status"
         );
 
-
     status.innerHTML =
         message;
-
 
     status.className =
         "status processing";
@@ -997,41 +674,15 @@ function showProcessing(message){
 }
 
 
-function showSuccess(message){
-
-    stopPaymentStatusChecking();
-
-
-    const status =
-        document.getElementById(
-            "status"
-        );
-
-
-    status.innerHTML =
-        message;
-
-
-    status.className =
-        "status success";
-
-}
-
-
 function showError(message){
 
-    stopPaymentStatusChecking();
-
-
     const status =
         document.getElementById(
             "status"
         );
 
-
     status.innerHTML =
         message;
-
 
     status.className =
         "status error";
@@ -1039,65 +690,109 @@ function showError(message){
 }
 
 
-function setPaymentOptionsDisabled(disabled){
+function showSuccess(message){
 
-    const phonePe =
+    const status =
         document.getElementById(
-            "phonePeOption"
+            "status"
         );
 
-    const paytm =
-        document.getElementById(
-            "paytmOption"
-        );
+    status.innerHTML =
+        message;
 
-
-    if(disabled){
-
-        phonePe.classList.add(
-            "disabled"
-        );
-
-        paytm.classList.add(
-            "disabled"
-        );
-
-    }else{
-
-        phonePe.classList.remove(
-            "disabled"
-        );
-
-        paytm.classList.remove(
-            "disabled"
-        );
-
-    }
+    status.className =
+        "status success";
 
 }
 
 
-document.addEventListener(
-    "visibilitychange",
-    function(){
+function setDisabled(disabled){
 
-        if(
-            document.visibilityState ===
-            "visible" &&
-            CURRENT_TRANSACTION_ID
-        ){
+    document
+        .getElementById(
+            "phonePeOption"
+        )
+        .classList
+        .toggle(
+            "disabled",
+            disabled
+        );
 
-            showProcessing(
-                "⏳ Payment Processing...<br>" +
-                "Payment confirmation is being checked."
-            );
 
-            startPaymentStatusChecking();
+    document
+        .getElementById(
+            "paytmOption"
+        )
+        .classList
+        .toggle(
+            "disabled",
+            disabled
+        );
 
-        }
+}
+
+
+function showQR(upiLink){
+
+    document
+        .getElementById(
+            "qrcode"
+        )
+        .innerHTML = "";
+
+
+    if(typeof QRCode === "undefined"){
+
+        showError(
+            "QR code load avvaledu."
+        );
+
+        setDisabled(false);
+
+        PAYMENT_STARTING = false;
+
+        return;
 
     }
-);
+
+
+    new QRCode(
+        document.getElementById(
+            "qrcode"
+        ),
+        {
+            text:upiLink,
+            width:220,
+            height:220
+        }
+    );
+
+
+    document
+        .getElementById(
+            "qrOverlay"
+        )
+        .style.display =
+        "flex";
+
+}
+
+
+function closeQR(){
+
+    document
+        .getElementById(
+            "qrOverlay"
+        )
+        .style.display =
+        "none";
+
+
+    PAYMENT_STARTING = false;
+
+    setDisabled(false);
+
+}
 
 
 loadPaymentConfig();
