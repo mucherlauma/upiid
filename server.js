@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const path = require("path");
 const { createClient } = require("@supabase/supabase-js");
@@ -15,17 +17,19 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "public")));
 
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 app.get("/api/payment-config", (req, res) => {
 
     res.json({
         upiId: process.env.UPI_ID,
         merchantName: process.env.MERCHANT_NAME || "Your Store",
-        amount: process.env.PAYMENT_AMOUNT || "500"
+        amount: process.env.PAYMENT_AMOUNT || "1"
     });
 
 });
-
 
 app.post("/api/create-payment", async (req, res) => {
 
@@ -46,11 +50,10 @@ app.post("/api/create-payment", async (req, res) => {
         }
 
         const amount =
-            process.env.PAYMENT_AMOUNT || "500";
+            process.env.PAYMENT_AMOUNT || "1";
 
         const upiId =
             process.env.UPI_ID;
-
 
         const { data, error } = await supabase
             .from("payments")
@@ -65,7 +68,6 @@ app.post("/api/create-payment", async (req, res) => {
             ])
             .select();
 
-
         if (error) {
 
             console.error("Supabase Error:", error);
@@ -77,13 +79,11 @@ app.post("/api/create-payment", async (req, res) => {
 
         }
 
-
         res.json({
             success: true,
             transactionId: transactionId,
             payment: data[0]
         });
-
 
     } catch (error) {
 
@@ -98,7 +98,6 @@ app.post("/api/create-payment", async (req, res) => {
 
 });
 
-
 app.get("/api/health", (req, res) => {
 
     res.json({
@@ -107,7 +106,6 @@ app.get("/api/health", (req, res) => {
     });
 
 });
-
 
 app.listen(PORT, "0.0.0.0", () => {
 
