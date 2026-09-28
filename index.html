@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPI Payment</title>
+
+    <title>Payment</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -18,132 +19,163 @@
         body {
             min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            background: #f3f5fa;
+            justify-content: center;
+            background: linear-gradient(135deg, #eef2ff, #f8f9ff);
+            padding: 20px;
         }
 
-        .payment-box {
-            width: 400px;
-            max-width: 92%;
+        .payment-container {
+            width: 420px;
+            max-width: 100%;
             background: white;
             padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+            border-radius: 22px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
             text-align: center;
         }
 
-        .payment-box h1 {
+        .payment-container h1 {
             color: #243b64;
             margin-bottom: 8px;
+            font-size: 28px;
         }
 
-        .payment-box p {
+        .subtitle {
             color: #777;
+            font-size: 14px;
             margin-bottom: 25px;
+        }
+
+        .amount-box {
+            background: #f4f7fb;
+            border-radius: 15px;
+            padding: 18px;
+            margin-bottom: 25px;
+        }
+
+        .amount-label {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 5px;
         }
 
         .amount {
-            font-size: 32px;
+            font-size: 34px;
             font-weight: bold;
-            color: #222;
-            margin-bottom: 25px;
+            color: #243b64;
         }
 
         .payment-option {
+            width: 100%;
             display: flex;
             align-items: center;
             gap: 15px;
-            padding: 18px;
-            margin: 15px 0;
-            border: 2px solid #eee;
-            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 15px;
+            background: white;
+            border: 2px solid #eeeeee;
+            border-radius: 15px;
             cursor: pointer;
             transition: 0.3s;
-            background: white;
+            text-align: left;
         }
 
         .payment-option:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-color: #243b64;
+            box-shadow: 0 8px 20px rgba(36, 59, 100, 0.12);
         }
 
-        .payment-option img {
-            width: 55px;
-            height: 55px;
+        .payment-logo {
+            width: 58px;
+            height: 58px;
+            border-radius: 12px;
             object-fit: contain;
+            background: #f7f7f7;
+            padding: 7px;
         }
 
-        .payment-option div {
-            text-align: left;
+        .payment-info {
+            flex: 1;
         }
 
-        .payment-option h3 {
+        .payment-info h3 {
             color: #222;
+            font-size: 17px;
             margin-bottom: 5px;
         }
 
-        .payment-option span {
+        .payment-info p {
+            color: #888;
             font-size: 13px;
-            color: #777;
+        }
+
+        .arrow {
+            font-size: 22px;
+            color: #243b64;
         }
 
         .status {
-            margin-top: 20px;
+            display: none;
+            margin-top: 15px;
             padding: 12px;
             border-radius: 10px;
-            display: none;
             font-size: 14px;
         }
 
         .error {
+            display: block;
             background: #ffe8e8;
             color: #c62828;
         }
 
-        .qr-popup {
-            display: none;
+        .qr-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.65);
-            justify-content: center;
+            display: none;
             align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.65);
+            padding: 20px;
             z-index: 1000;
         }
 
         .qr-box {
+            width: 350px;
+            max-width: 100%;
             background: white;
-            width: 340px;
-            max-width: 90%;
+            border-radius: 20px;
             padding: 25px;
-            border-radius: 18px;
             text-align: center;
         }
 
         .qr-box h2 {
-            margin-bottom: 8px;
             color: #243b64;
+            margin-bottom: 8px;
         }
 
         .qr-box p {
-            color: #666;
+            color: #777;
             font-size: 14px;
+            line-height: 1.5;
             margin-bottom: 18px;
         }
 
         #qrcode {
             display: flex;
             justify-content: center;
-            margin: 15px 0;
+            align-items: center;
+            margin: 20px 0;
         }
 
         .close-btn {
             width: 100%;
             border: none;
-            padding: 12px;
-            border-radius: 10px;
             background: #243b64;
             color: white;
+            padding: 13px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 15px;
         }
@@ -152,13 +184,28 @@
             background: #172b4d;
         }
 
-        @media (max-width: 500px) {
-            .payment-box {
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        @media (max-width: 480px) {
+
+            .payment-container {
                 padding: 22px;
             }
 
+            .payment-container h1 {
+                font-size: 24px;
+            }
+
             .amount {
-                font-size: 28px;
+                font-size: 30px;
+            }
+
+            .payment-logo {
+                width: 50px;
+                height: 50px;
             }
         }
     </style>
@@ -166,45 +213,92 @@
 
 <body>
 
-    <div class="payment-box">
+    <div class="payment-container" id="paymentContainer">
 
         <h1>Make Payment</h1>
-        <p>Choose your preferred payment app</p>
 
-        <div class="amount" id="amount">
-            ₹0
+        <p class="subtitle">
+            Choose your preferred payment method
+        </p>
+
+        <div class="amount-box">
+
+            <div class="amount-label">
+                Amount Payable
+            </div>
+
+            <div class="amount" id="amount">
+                Loading...
+            </div>
+
         </div>
+
 
         <div class="payment-option" onclick="payWithPhonePe()">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.svg" alt="PhonePe">
 
-            <div>
+            <img
+                class="payment-logo"
+                src="https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.svg"
+                alt="PhonePe"
+            >
+
+            <div class="payment-info">
+
                 <h3>PhonePe</h3>
-                <span>Pay using PhonePe</span>
+
+                <p>
+                    Pay securely using PhonePe
+                </p>
+
             </div>
+
+            <div class="arrow">
+                →
+            </div>
+
         </div>
+
 
         <div class="payment-option" onclick="payWithPaytm()">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/Paytm_logo.png" alt="Paytm">
 
-            <div>
+            <img
+                class="payment-logo"
+                src="https://upload.wikimedia.org/wikipedia/commons/4/42/Paytm_logo.png"
+                alt="Paytm"
+            >
+
+            <div class="payment-info">
+
                 <h3>Paytm</h3>
-                <span>Pay using Paytm</span>
+
+                <p>
+                    Pay securely using Paytm
+                </p>
+
             </div>
+
+            <div class="arrow">
+                →
+            </div>
+
         </div>
+
 
         <div id="status" class="status"></div>
 
     </div>
 
 
-    <div class="qr-popup" id="qrPopup">
+    <div class="qr-overlay" id="qrOverlay">
 
         <div class="qr-box">
 
             <h2>Scan & Pay</h2>
 
-            <p>Scan this QR code using any UPI app</p>
+            <p>
+                Scan this QR code using PhonePe, Paytm
+                or any UPI application.
+            </p>
 
             <div id="qrcode"></div>
 
@@ -223,6 +317,7 @@
         let MERCHANT_NAME = "";
         let AMOUNT = "";
 
+
         async function loadPaymentConfig() {
 
             try {
@@ -230,7 +325,7 @@
                 const response = await fetch("/api/payment-config");
 
                 if (!response.ok) {
-                    throw new Error("Payment configuration failed");
+                    throw new Error("Configuration failed");
                 }
 
                 const data = await response.json();
@@ -239,13 +334,21 @@
                 MERCHANT_NAME = data.merchantName;
                 AMOUNT = data.amount;
 
-                document.getElementById("amount").innerText = "₹" + AMOUNT;
+                if (!UPI_ID) {
+                    throw new Error("UPI ID not available");
+                }
+
+                document.getElementById("amount").innerText =
+                    "₹" + AMOUNT;
 
             } catch (error) {
 
-                showError("Payment configuration load avvaledu. Please try again.");
+                showError(
+                    "Payment details load avvaledu. Please try again."
+                );
 
             }
+
         }
 
 
@@ -262,60 +365,138 @@
 
         function isMobile() {
 
-            return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            return /Android|iPhone|iPad|iPod/i.test(
+                navigator.userAgent
+            );
 
         }
 
 
-        function payWithPhonePe() {
+        async function createPayment(method) {
 
-            if (!UPI_ID) {
-                showError("Payment details loading... Please wait.");
-                return;
+            const transactionId =
+                "TXN" + Date.now();
+
+            const response = await fetch(
+                "/api/create-payment",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        transactionId: transactionId,
+                        paymentMethod: method
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(
+                    data.message || "Payment creation failed"
+                );
             }
 
-            const upiLink = createUPILink();
+            return transactionId;
 
-            if (isMobile()) {
-
-                window.location.href =
-                    "phonepe://pay" +
-                    "?pa=" + encodeURIComponent(UPI_ID) +
-                    "&pn=" + encodeURIComponent(MERCHANT_NAME) +
-                    "&am=" + encodeURIComponent(AMOUNT) +
-                    "&cu=INR";
-
-            } else {
-
-                showQR(upiLink);
-
-            }
         }
 
 
-        function payWithPaytm() {
+        async function payWithPhonePe() {
 
-            if (!UPI_ID) {
-                showError("Payment details loading... Please wait.");
-                return;
+            try {
+
+                if (!UPI_ID) {
+                    showError(
+                        "Payment details loading... Please wait."
+                    );
+                    return;
+                }
+
+                setLoading(true);
+
+                await createPayment("PhonePe");
+
+                const upiLink = createUPILink();
+
+                if (isMobile()) {
+
+                    window.location.href =
+                        "phonepe://pay" +
+                        "?pa=" + encodeURIComponent(UPI_ID) +
+                        "&pn=" + encodeURIComponent(MERCHANT_NAME) +
+                        "&am=" + encodeURIComponent(AMOUNT) +
+                        "&cu=INR";
+
+                } else {
+
+                    showQR(upiLink);
+
+                }
+
+            } catch (error) {
+
+                showError(
+                    "Payment start avvaledu. Please try again."
+                );
+
+            } finally {
+
+                setLoading(false);
+
             }
 
-            const upiLink = createUPILink();
+        }
 
-            if (isMobile()) {
 
-                window.location.href =
-                    "paytmmp://pay" +
-                    "?pa=" + encodeURIComponent(UPI_ID) +
-                    "&pn=" + encodeURIComponent(MERCHANT_NAME) +
-                    "&am=" + encodeURIComponent(AMOUNT) +
-                    "&cu=INR";
+        async function payWithPaytm() {
 
-            } else {
+            try {
 
-                showQR(upiLink);
+                if (!UPI_ID) {
+                    showError(
+                        "Payment details loading... Please wait."
+                    );
+                    return;
+                }
+
+                setLoading(true);
+
+                await createPayment("Paytm");
+
+                const upiLink = createUPILink();
+
+                if (isMobile()) {
+
+                    window.location.href =
+                        "paytmmp://pay" +
+                        "?pa=" + encodeURIComponent(UPI_ID) +
+                        "&pn=" + encodeURIComponent(MERCHANT_NAME) +
+                        "&am=" + encodeURIComponent(AMOUNT) +
+                        "&cu=INR";
+
+                } else {
+
+                    showQR(upiLink);
+
+                }
+
+            } catch (error) {
+
+                showError(
+                    "Payment start avvaledu. Please try again."
+                );
+
+            } finally {
+
+                setLoading(false);
 
             }
+
         }
 
 
@@ -323,31 +504,56 @@
 
             document.getElementById("qrcode").innerHTML = "";
 
-            new QRCode(document.getElementById("qrcode"), {
-                text: upiLink,
-                width: 220,
-                height: 220
-            });
+            new QRCode(
+                document.getElementById("qrcode"),
+                {
+                    text: upiLink,
+                    width: 220,
+                    height: 220
+                }
+            );
 
-            document.getElementById("qrPopup").style.display = "flex";
+            document.getElementById("qrOverlay").style.display =
+                "flex";
 
         }
 
 
         function closeQR() {
 
-            document.getElementById("qrPopup").style.display = "none";
+            document.getElementById("qrOverlay").style.display =
+                "none";
 
         }
 
 
         function showError(message) {
 
-            const status = document.getElementById("status");
+            const status =
+                document.getElementById("status");
 
             status.innerText = message;
-            status.className = "status error";
-            status.style.display = "block";
+
+            status.className =
+                "status error";
+
+        }
+
+
+        function setLoading(isLoading) {
+
+            const container =
+                document.getElementById("paymentContainer");
+
+            if (isLoading) {
+
+                container.classList.add("loading");
+
+            } else {
+
+                container.classList.remove("loading");
+
+            }
 
         }
 
