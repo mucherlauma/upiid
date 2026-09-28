@@ -1,12 +1,13 @@
 {
   "name": "upi-payment-website",
   "version": "1.0.0",
-  "description": "UPI Payment Website",
+  "description": "UPI Payment Website with Supabase",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
     "express": "^4.21.2"
   }
 }
