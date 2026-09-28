@@ -16,15 +16,25 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+
+    res.sendFile(
+        path.join(__dirname, "public", "index.html")
+    );
+
 });
 
 app.get("/api/payment-config", (req, res) => {
 
     res.json({
+
         upiId: process.env.UPI_ID,
-        merchantName: process.env.MERCHANT_NAME || "Your Store",
-        amount: process.env.PAYMENT_AMOUNT || "1"
+
+        merchantName:
+            process.env.MERCHANT_NAME || "Your Store",
+
+        amount:
+            process.env.PAYMENT_AMOUNT || "1"
+
     });
 
 });
@@ -41,8 +51,12 @@ app.post("/api/create-payment", async (req, res) => {
         if (!transactionId || !paymentMethod) {
 
             return res.status(400).json({
+
                 success: false,
-                message: "Payment details missing"
+
+                message:
+                    "Payment details missing"
+
             });
 
         }
@@ -53,62 +67,183 @@ app.post("/api/create-payment", async (req, res) => {
         const upiId =
             process.env.UPI_ID;
 
-        const { data, error } = await supabase
-            .from("payments")
-            .insert([
-                {
-                    transaction_id: transactionId,
-                    upi_id: upiId,
-                    amount: Number(amount),
-                    payment_method: paymentMethod,
-                    status: "PENDING"
-                }
-            ])
-            .select();
+        const { data, error } =
+            await supabase
+
+                .from("payments")
+
+                .insert([
+                    {
+                        transaction_id:
+                            transactionId,
+
+                        upi_id:
+                            upiId,
+
+                        amount:
+                            Number(amount),
+
+                        payment_method:
+                            paymentMethod,
+
+                        status:
+                            "PENDING"
+                    }
+                ])
+
+                .select();
 
         if (error) {
 
-            console.error("Supabase Error:", error);
+            console.error(
+                "Supabase Error:",
+                error
+            );
 
             return res.status(500).json({
+
                 success: false,
-                message: "Payment record create failed"
+
+                message:
+                    "Payment record create failed"
+
             });
 
         }
 
         res.json({
+
             success: true,
-            transactionId: transactionId,
-            payment: data[0]
+
+            transactionId:
+                transactionId,
+
+            payment:
+                data[0]
+
         });
 
     } catch (error) {
 
-        console.error("Server Error:", error);
+        console.error(
+            "Server Error:",
+            error
+        );
 
         res.status(500).json({
+
             success: false,
-            message: "Server error"
+
+            message:
+                "Server error"
+
         });
 
     }
 
 });
 
+app.get(
+    "/api/payment-status/:transactionId",
+    async (req, res) => {
+
+        try {
+
+            const transactionId =
+                req.params.transactionId;
+
+            const { data, error } =
+                await supabase
+
+                    .from("payments")
+
+                    .select(
+                        "transaction_id, amount, payment_method, status, created_at"
+                    )
+
+                    .eq(
+                        "transaction_id",
+                        transactionId
+                    )
+
+                    .single();
+
+            if (error || !data) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    status:
+                        "NOT_FOUND"
+
+                });
+
+            }
+
+            res.json({
+
+                success: true,
+
+                transactionId:
+                    data.transaction_id,
+
+                amount:
+                    data.amount,
+
+                paymentMethod:
+                    data.payment_method,
+
+                status:
+                    data.status,
+
+                createdAt:
+                    data.created_at
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Payment Status Error:",
+                error
+            );
+
+            res.status(500).json({
+
+                success: false,
+
+                status:
+                    "ERROR"
+
+            });
+
+        }
+
+    }
+);
+
 app.get("/api/health", (req, res) => {
 
     res.json({
+
         status: "OK",
-        message: "Payment server is running"
+
+        message:
+            "Payment server is running"
+
     });
 
 });
 
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(
+    PORT,
+    "0.0.0.0",
+    () => {
 
-    console.log(
-        `Server running on port ${PORT}`
-    );
+        console.log(
+            `Server running on port ${PORT}`
+        );
 
-});
+    }
+);
